@@ -40,10 +40,10 @@ YearInputDialog::YearInputDialog(wxWindow* parent, const wxString& year, const o
   auto* box_sizer2 = new wxBoxSizer(wxHORIZONTAL);
   auto* box_sizer3 = new wxBoxSizer(wxHORIZONTAL);
   auto* box_sizer4 = new wxBoxSizer(wxHORIZONTAL);
-  box_sizer3->Add(m_static_text, wxSizerFlags().Center().Border(wxALL));
+  box_sizer3->Add(m_static_text2, wxSizerFlags().Center().Border(wxALL));
   box_sizer3->Add(m_text_ctrl, wxSizerFlags(1).Expand().Border(wxALL));
   box_sizer->Add(box_sizer3, wxSizerFlags().Expand().Border(wxALL));
-  box_sizer4->Add(m_static_text2, wxSizerFlags().Center().Border(wxALL));
+  box_sizer4->Add(m_static_text, wxSizerFlags().Center().Border(wxALL));
   box_sizer4->Add(m_choice, wxSizerFlags(1).Expand().Border(wxALL));
   box_sizer->Add(box_sizer4, wxSizerFlags().Expand().Border(wxALL));
   grid_sizer->Add(box_sizer, wxSizerFlags().Expand().Border(wxALL));
