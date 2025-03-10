@@ -6,27 +6,48 @@ name: Manual workflow
 # or API.
 on:
   workflow_dispatch:
-    # Inputs the workflow accepts.
-    inputs:
-      name:
-        # Friendly description to be shown in the UI instead of 'name'
-        description: 'Person to greet'
-        # Default value if no value is explicitly provided
-        default: 'World'
-        # Input has to be provided for the workflow to run
-        required: true
-        # The data type of the input
-        type: string
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  WXWIDGETS_VER: 3.2.6
+
 jobs:
-  # This workflow contains a single job called "greet"
-  greet:
-    # The type of runner that the job will run on
+  build:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - name: Send greeting
-      run: echo "Hello ${{ inputs.name }}"
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+          cmake build-essential libssl-dev gettext git pkg-config lsb-release \
+          libgtk-3-dev libcurl4-openssl-dev libwebkit2gtk-4.0-dev wget
+
+      - name: Build & Install wxWidgets
+        run: |
+          cd ~
+          wget https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
+          tar -xjf wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
+          cd wxWidgets-${{env.WXWIDGETS_VER}}
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
+          sudo cmake --build build --target install
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build oxcalfrp
+        run: |
+          cd $GITHUB_WORKSPACE
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target package
+          cmake --install build --prefix AppDir
+          curl -LO https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          curl -LO https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
+          ./linuxdeploy-x86_64.AppImage --appdir $(pwd)/AppDir --plugin gtk --output appimage
+          mv ./build/oxcalfrp*.AppImage $(echo ./build/oxcalfrp*.deb | sed 's/deb/AppImage/')
+          ll
+
+
+
+
+
