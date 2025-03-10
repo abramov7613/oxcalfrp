@@ -4,19 +4,14 @@ cmake_minimum_required(VERSION 3.25)
 
 # Find Git commit details to get project version from latest commit tag
 find_package(Git REQUIRED)
-execute_process(COMMAND ${GIT_EXECUTABLE} show -s --format=%H
+execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --match ".[0-9]+.[0-9]+.[0-9]+" --abbrev=8
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_LATEST_COMMIT_HASH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${GIT_EXECUTABLE} tag --points-at ${GIT_LATEST_COMMIT_HASH}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_LATEST_COMMIT_TAG_STRING
+    OUTPUT_VARIABLE GIT_LATEST_TAG_STRING
     OUTPUT_STRIP_TRAILING_WHITESPACE
     COMMAND_ERROR_IS_FATAL ANY)
 # Extract version number
-if(GIT_LATEST_COMMIT_TAG_STRING MATCHES "v([0-9]+\.[0-9]+\.[0-9]+)")
-  set(OXCALFRP_VERSION ${CMAKE_MATCH_1});
+if(GIT_LATEST_TAG_STRING MATCHES "v([0-9]+\.[0-9]+\.[0-9]+)")
+  set(OXCALFRP_VERSION ${CMAKE_MATCH_1})
 else()
   message(FATAL_ERROR "Can't get project version from Git. "
                       "Check latest commit tag string, so that it contains the necessary data")
@@ -82,8 +77,8 @@ endif()
 # =================================================================================
 CPMAddPackage(
     NAME sqlite3
-    URL "https://sqlite.org/2024/sqlite-amalgamation-3470100.zip"
-    URL_HASH SHA256=9da21e6b14ef6a943cdc30f973df259fb390bb4483f77e7f171b9b6e977e5458
+    URL "https://sqlite.org/2025/sqlite-amalgamation-3490100.zip"
+    URL_HASH SHA256=6cebd1d8403fc58c30e93939b246f3e6e58d0765a5cd50546f16c00fd805d2c3
     DOWNLOAD_ONLY TRUE
 )
 if(NOT sqlite3_ADDED)
@@ -194,18 +189,28 @@ include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME})
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+  set(CPACK_PACKAGE_VENDOR "Vladimir Abramov")
+  set(CPACK_PACKAGE_CONTACT "abramov7613@yandex.ru")
+  set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+  set(CPACK_PACKAGE_DESCRIPTION "Православный церковный календарь для исследовательских целей - это приложение с открытым исходным кодом для настольных ПК под управлением ОС Windows или Linux. ")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Православный церковный календарь диц")
-  set(CPACK_VERBATIM_VARIABLES          YES)
+  set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_LIST_DIR}/LICENSE)
+  set(CPACK_RESOURCE_FILE_README  ${CMAKE_CURRENT_LIST_DIR}/README.md)
+  set(CPACK_VERBATIM_VARIABLES YES)
   if(WIN32)
-      set(CPACK_GENERATOR NSIS)
+    set(CPACK_GENERATOR ZIP)
   elseif(APPLE)
-      set(CPACK_GENERATOR productbuild)
+    set(CPACK_GENERATOR productbuild)
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      set(CPACK_GENERATOR DEB)
-      set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-      set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
-      set(CPACK_DEBIAN_PACKAGE_MAINTAINER "abramov7613@yandex.ru")
+    set(CPACK_GENERATOR DEB)
+    set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+  else()
+    set(CPACK_GENERATOR TXZ)
   endif()
   include(CPack)
 endif()
