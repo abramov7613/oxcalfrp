@@ -1,6 +1,29 @@
-cmake_minimum_required(VERSION 3.25)
-project(oxcalfrp)
+# This project uses Git tag system for version control.
 
+cmake_minimum_required(VERSION 3.25)
+
+# Find Git commit details to get project version from latest commit tag
+find_package(Git REQUIRED)
+execute_process(COMMAND ${GIT_EXECUTABLE} show -s --format=%H
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_LATEST_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND ${GIT_EXECUTABLE} tag --points-at ${GIT_LATEST_COMMIT_HASH}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_LATEST_COMMIT_TAG_STRING
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    COMMAND_ERROR_IS_FATAL ANY)
+# Extract version number
+if(GIT_LATEST_COMMIT_TAG_STRING MATCHES "v([0-9]+\.[0-9]+\.[0-9]+)")
+  set(OXCALFRP_VERSION ${CMAKE_MATCH_1});
+else()
+  message(FATAL_ERROR "Can't get project version from Git. "
+                      "Check latest commit tag string, so that it contains the necessary data")
+endif()
+
+# setup project options
+project(oxcalfrp VERSION ${OXCALFRP_VERSION})
 set(RESOURCES_FOLDER_NAME "resources")
 set(EXTERN_PROJECTS_FOLDER_NAME "extern")
 set(RESOURCES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}")
@@ -20,6 +43,26 @@ set(SQLITE3_DB_SOURCES
 )
 string(REPLACE ";" "$<SEMICOLON>" SQLITE3_DB_SRCS "${SQLITE3_DB_SOURCES}")
 set(SQLITE3_DB_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}/sqlite_db.zip")
+set(OXCALFRP_SOURCES
+    src/aboutdialog.cpp
+    src/calendarpanel.cpp
+    src/main.cpp
+    src/mainframe.cpp
+    src/monthchoicectrl.cpp
+    src/numbertextctrl.cpp
+    src/fs_mem_rc.cpp
+    src/yearinputdialog.cpp
+)
+
+# =================================================================================
+# enable CPM
+# =================================================================================
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${EXTERN_PROJECTS_FOLDER_NAME}")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${EXTERN_PROJECTS_FOLDER_NAME}")
+endif()
+set(CPM_SOURCE_CACHE ${EXTERN_PROJECTS_FOLDER_NAME})
+include(cmake/CPM.cmake)
+
 # =================================================================================
 # find wxWidgets library
 # =================================================================================
@@ -33,15 +76,6 @@ set(wxWidgets_USE_STATIC ON)
 if(wxWidgets_USE_FILE) # not defined in CONFIG mode
   include(${wxWidgets_USE_FILE})
 endif()
-
-# =================================================================================
-# enable CPM
-# =================================================================================
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${EXTERN_PROJECTS_FOLDER_NAME}")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${EXTERN_PROJECTS_FOLDER_NAME}")
-endif()
-set(CPM_SOURCE_CACHE ${EXTERN_PROJECTS_FOLDER_NAME})
-include(cmake/CPM.cmake)
 
 # =================================================================================
 # get sqlite3
@@ -97,10 +131,9 @@ CPMAddPackage("gh:abramov7613/cmake_timestamp@1.0.1")
 if (NOT cmake_timestamp_ADDED)
   message(FATAL_ERROR "Can't get cmake_timestamp library")
 endif()
-target_include_directories(cmake_timestamp PUBLIC $<BUILD_INTERFACE:${cmake_timestamp_SOURCE_DIR}>)
 
 # =================================================================================
-# targets
+# define targets
 # =================================================================================
 add_executable(wxZipper src/wxZipper.cpp)
 target_compile_features(wxZipper PRIVATE cxx_std_20)
@@ -138,20 +171,10 @@ add_dependencies(project_resources
     resource_header_name_gen
     sql_generator
 )
-add_executable(${PROJECT_NAME}
-    src/aboutdialog.cpp
-    src/calendarpanel.cpp
-    src/main.cpp
-    src/mainframe.cpp
-    src/monthchoicectrl.cpp
-    src/numbertextctrl.cpp
-    src/fs_mem_rc.cpp
-    src/yearinputdialog.cpp
-)
+add_executable(${PROJECT_NAME} WIN32 ${OXCALFRP_SOURCES})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 target_include_directories(${PROJECT_NAME} PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${Lua_SOURCE_DIR}/src"
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries(${PROJECT_NAME}
@@ -161,12 +184,28 @@ target_link_libraries(${PROJECT_NAME}
     sqlite_modern_cpp
     cmake_timestamp
 )
-if(CMAKE_HOST_WIN32)
-  target_link_options(${PROJECT_NAME} PRIVATE
-      $<$<CXX_COMPILER_ID:GNU>:-static>
-      $<$<CXX_COMPILER_ID:GNU>:-static-libgcc>
-      $<$<CXX_COMPILER_ID:GNU>:-static-libstdc++>
-      $<$<CXX_COMPILER_ID:GNU>:-Wl,--subsystem,windows>
-  )
-endif()
 add_dependencies(${PROJECT_NAME} project_resources)
+
+# =================================================================================
+# install & pack
+# =================================================================================
+
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME})
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Православный церковный календарь диц")
+  set(CPACK_VERBATIM_VARIABLES          YES)
+  if(WIN32)
+      set(CPACK_GENERATOR NSIS)
+  elseif(APPLE)
+      set(CPACK_GENERATOR productbuild)
+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      set(CPACK_GENERATOR DEB)
+      set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+      set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+      set(CPACK_DEBIAN_PACKAGE_MAINTAINER "abramov7613@yandex.ru")
+  endif()
+  include(CPack)
+endif()
