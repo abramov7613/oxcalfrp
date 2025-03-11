@@ -1,6 +1,4 @@
 #include "main.h"
-#include <bits/utility.h>                                    // for _Nth_typ...
-#include <stddef.h>                                          // for NULL
 #include <wx/datetime.h>                                     // for wxDateTime
 #include <wx/image.h>                                        // for wxImage
 #include <wx/imagjpeg.h>                                     // for wxJPEGHa...
