@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.25)
 
 # Find Git commit details to get project version from latest commit tag
 find_package(Git REQUIRED)
-execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --match ".[0-9]+.[0-9]+.[0-9]+" --abbrev=8
+execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_LATEST_TAG_STRING
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -122,7 +122,7 @@ set(OXC_H_FILE "${oxc_SOURCE_DIR}/oxc.h")
 # =================================================================================
 # get timestamp library
 # =================================================================================
-CPMAddPackage("gh:abramov7613/cmake_timestamp@1.0.1")
+CPMAddPackage("gh:abramov7613/cmake_timestamp@1.0.3")
 if (NOT cmake_timestamp_ADDED)
   message(FATAL_ERROR "Can't get cmake_timestamp library")
 endif()
