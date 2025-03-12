@@ -71,8 +71,20 @@ jobs:
           curl -LO https://github.com/darealshinji/linuxdeploy-plugin-checkrt/releases/download/continuous/linuxdeploy-plugin-checkrt.sh
           chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh linuxdeploy-plugin-checkrt.sh
           export DEPLOY_GTK_VERSION=3
-          ./linuxdeploy-x86_64.AppImage --appdir $(pwd)/AppDir --plugin gtk --plugin checkrt --executable $(pwd)/AppDir/bin/oxcalfrp --output appimage
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --plugin checkrt --executable ./bin/oxcalfrp --output appimage
           mv $(pwd)/oxc*.AppImage $(echo $(pwd)/oxc*.deb | sed 's/deb/AppImage/')
           echo "deb_artifact_name=$(ls oxc*.deb)" >> $GITHUB_OUTPUT
           echo "appimage_artifact_name=$(ls oxc*.AppImage)" >> $GITHUB_OUTPUT
           cd AppDir && tree -fi
+
+      - name: Upload DEB Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.oxcalfrp-build.outputs.deb_artifact_name }}
+          path: build/oxc*.deb
+
+      - name: Upload AppImage Pachage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.oxcalfrp-build.outputs.appimage_artifact_name }}
+          path: build/oxc*.AppImage
