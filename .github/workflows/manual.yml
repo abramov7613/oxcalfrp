@@ -61,16 +61,16 @@ jobs:
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --target package
           cmake --install build --prefix AppDir
-          touch ./build/AppDir/oxcalfrp.desktop
-          echo -e "[Desktop Entry]\nType=Application\nName=oxcalfrp\nGenericName=Orthodox Calendar frp\nExec=oxcalfrp\nIcon=oxcalfrp\nTerminal=false\nCategories=Science\n" > ./build/AppDir/oxcalfrp.desktop
-          cp ./resources/ICXC_NIKA.png ./build/AppDir/oxcalfrp.png
+          touch $(pwd)/AppDir/oxcalfrp.desktop
+          echo -e "[Desktop Entry]\nType=Application\nName=oxcalfrp\nGenericName=Orthodox Calendar frp\nExec=oxcalfrp\nIcon=oxcalfrp\nTerminal=false\nCategories=Science\n" > $(pwd)/AppDir/oxcalfrp.desktop
+          cp $(pwd)/resources/ICXC_NIKA.png $(pwd)/AppDir/oxcalfrp.png
           curl -LO https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           curl -LO https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
           curl -LO https://github.com/darealshinji/linuxdeploy-plugin-checkrt/releases/download/continuous/linuxdeploy-plugin-checkrt.sh
           chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh linuxdeploy-plugin-checkrt.sh
           export DEPLOY_GTK_VERSION=3
           ./linuxdeploy-x86_64.AppImage --appdir $(pwd)/AppDir --plugin gtk --plugin checkrt --output appimage
-          mv ./build/oxcalfrp*.AppImage $(echo ./build/oxcalfrp*.deb | sed 's/deb/AppImage/')
+          mv $(pwd)/build/oxcalfrp*.AppImage $(echo $(pwd)/build/oxcalfrp*.deb | sed 's/deb/AppImage/')
           
       - uses: actions/upload-artifact@v4
         with:
