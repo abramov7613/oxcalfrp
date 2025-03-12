@@ -19,7 +19,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
           cmake build-essential libssl-dev gettext git pkg-config lsb-release \
-          libgtk-3-dev libcurl4-openssl-dev libwebkit2gtk-4.1-dev wget tree
+          libgtk-3-dev libcurl4-openssl-dev libwebkit2gtk-4.1-dev wget 
 
       - name: Restore wxWidgets from Cache
         id: restore-cache-wxWidgets
@@ -56,6 +56,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build oxcalfrp
+        id: oxcalfrp-build
         run: |
           cd $GITHUB_WORKSPACE
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -70,6 +71,19 @@ jobs:
           curl -LO https://github.com/darealshinji/linuxdeploy-plugin-checkrt/releases/download/continuous/linuxdeploy-plugin-checkrt.sh
           chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh linuxdeploy-plugin-checkrt.sh
           export DEPLOY_GTK_VERSION=3
-          ./linuxdeploy-x86_64.AppImage --appdir $(pwd)/AppDir --plugin gtk --plugin checkrt --output appimage
+          ./linuxdeploy-x86_64.AppImage --appdir $(pwd)/AppDir --plugin gtk --plugin checkrt --executable $(pwd)/AppDir/bin/oxcalfrp --output appimage
           mv $(pwd)/oxc*.AppImage $(echo $(pwd)/oxc*.deb | sed 's/deb/AppImage/')
-          cd AppDir && tree -fi
+          echo "deb_artifact_name=$(ls oxc*.deb)" >> $GITHUB_OUTPUT
+          echo "appimage_artifact_name=$(ls oxc*.AppImage)" >> $GITHUB_OUTPUT
+
+      - name: Upload DEB Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.oxcalfrp-build.outputs.deb_artifact_name }}
+          path: build/oxc*.deb
+
+      - name: Upload AppImage Pachage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.oxcalfrp-build.outputs.appimage_artifact_name }}
+          path: build/oxc*.AppImage
