@@ -81,9 +81,11 @@ jobs:
         with:
           name: ${{ steps.oxcalfrp-build.outputs.deb_artifact_name }}
           path: build/oxc*.deb
+          compression-level: 0
 
-      - name: Upload AppImage Pachage
+      - name: Upload AppImage Package
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.oxcalfrp-build.outputs.appimage_artifact_name }}
           path: build/oxc*.AppImage
+          compression-level: 0
