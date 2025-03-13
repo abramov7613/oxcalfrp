@@ -63,8 +63,9 @@ jobs:
           cmake --build build --target package
           cd build
           make install DESTDIR=AppDir
-          touch $(pwd)/AppDir/usr/share/applications/oxcalfrp.desktop
-          echo -e "[Desktop Entry]\nType=Application\nName=oxcalfrp\nGenericName=Orthodox Calendar frp\nIcon=oxcalfrp\nTerminal=false\nCategories=Science\nExec=oxcalfrp\n" > $(pwd)/AppDir/usr/share/applications/oxcalfrp.desktop
+          touch oxcalfrp.desktop
+          echo -e "[Desktop Entry]\nType=Application\nName=oxcalfrp\nGenericName=Orthodox Calendar frp\nIcon=oxcalfrp\nTerminal=false\nCategories=Science\nExec=oxcalfrp\n" > oxcalfrp.desktop
+          mv oxcalfrp.desktop $(pwd)/AppDir/usr/share/applications/oxcalfrp.desktop
           cp $(pwd)/../resources/ICXC_NIKA.png $(pwd)/AppDir/usr/share/icons/hicolor/256x256/apps/oxcalfrp.png
           curl -LO https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           curl -LO https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
