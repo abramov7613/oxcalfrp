@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/wxWidgets-${{env.WXWIDGETS_VER}}
-          key: ${{runner.os}}-${{ steps.system-info.outputs.release }}-wxWidgets-${{env.WXWIDGETS_VER}}
+          key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
 
       - name: Build wxWidgets
         if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
@@ -52,7 +52,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/wxWidgets-${{env.WXWIDGETS_VER}}
-          key: ${{runner.os}}-${{ steps.system-info.outputs.release }}-wxWidgets-${{env.WXWIDGETS_VER}}
+          key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
 
       - uses: actions/checkout@v4
         with:
@@ -66,8 +66,9 @@ jobs:
           # cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
           cmake --build build --target package
+          cd build
+          echo "deb_artifact_name=$(ls oxc*.deb)" >> $GITHUB_OUTPUT
           # next lines needs only for build AppImage artifact
-          # cd build
           # make install DESTDIR=AppDir
           # touch oxcalfrp.desktop
           # echo -e "[Desktop Entry]\nType=Application\nName=oxcalfrp\nGenericName=Orthodox Calendar frp\nIcon=oxcalfrp\nTerminal=false\nCategories=Science\nExec=oxcalfrp\n" > oxcalfrp.desktop
@@ -80,13 +81,12 @@ jobs:
           # ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --output appimage -i oxcalfrp.png
           # mv $(pwd)/oxc*.AppImage $(echo $(pwd)/oxc*.deb | sed 's/deb/AppImage/')
           # echo "appimage_artifact_name=$(ls oxc*.AppImage)" >> $GITHUB_OUTPUT
-          echo "deb_artifact_name=$(ls oxc*.deb)" >> $GITHUB_OUTPUT
 
       - name: Upload DEB Package
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.oxcalfrp-build.outputs.deb_artifact_name }}
-          path: build/oxc*.deb
+          path: build/${{ steps.oxcalfrp-build.outputs.deb_artifact_name }}
           compression-level: 0
 
       # - name: Upload AppImage Package
