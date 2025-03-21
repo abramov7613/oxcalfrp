@@ -35,7 +35,7 @@ jobs:
         wget https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
         tar -xjf wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
         cd wxWidgets-${{env.WXWIDGETS_VER}}
-        cmake -S . -B build -DPACKAGE_TYPE_FOR_LINUX=RPM -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
         cmake --build build
 
     - name: Install wxWidgets
@@ -60,7 +60,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         git config --global --add safe.directory '*'
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPACKAGE_TYPE_FOR_LINUX=RPM
         cmake --build build --target package
         cd build
         echo "rpm_artifact_name=$(ls oxc*.rpm)" >> $GITHUB_OUTPUT
