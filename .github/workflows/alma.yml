@@ -14,9 +14,9 @@ jobs:
     steps:
     - name: Install Dependencies
       run: |
-        dnf upgrade
-        dnf groupinstall -y "Development Tools"
-        dnf install -y pkg-config lsb-release git cmake wget openssl-devel zlib-devel gtk3-devel libcurl-devel webkit2gtk3-devel
+        dnf -y upgrade
+        dnf -y groupinstall "Development Tools"
+        dnf -y install pkg-config lsb-release git cmake wget openssl-devel zlib-devel gtk3-devel libcurl-devel webkit2gtk3-devel
 
     - uses: kenchan0130/actions-system-info@master
       id: system-info
