@@ -16,7 +16,7 @@ jobs:
       run: |
         dnf -y upgrade
         dnf -y groupinstall "Development Tools"
-        dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel redhat-lsb
+        dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel
 
     - uses: kenchan0130/actions-system-info@master
       id: system-info
