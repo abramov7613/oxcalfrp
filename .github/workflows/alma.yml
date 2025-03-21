@@ -16,7 +16,7 @@ jobs:
       run: |
         dnf -y upgrade
         dnf -y groupinstall "Development Tools"
-        dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel
+        dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel redhat-lsb-core
 
     - uses: kenchan0130/actions-system-info@master
       id: system-info
@@ -35,7 +35,7 @@ jobs:
         wget https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
         tar -xjf wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
         cd wxWidgets-${{env.WXWIDGETS_VER}}
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
+        cmake -S . -B build -DPACKAGE_TYPE_FOR_LINUX=RPM -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
         cmake --build build
 
     - name: Install wxWidgets
@@ -51,4 +51,22 @@ jobs:
         path: ~/wxWidgets-${{env.WXWIDGETS_VER}}
         key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
 
-      
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Build oxcalfrp
+      id: oxcalfrp-build
+      run: |
+        cd $GITHUB_WORKSPACE
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
+        cmake --build build --target package
+        cd build
+        echo "rpm_artifact_name=$(ls oxc*.rpm)" >> $GITHUB_OUTPUT
+
+    - name: Upload RPM Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.oxcalfrp-build.outputs.rpm_artifact_name }}
+        path: build/${{ steps.oxcalfrp-build.outputs.rpm_artifact_name }}
+        compression-level: 0
