@@ -1,4 +1,4 @@
-# This project uses Git tag system for version control.
+# This project uses Git tag system for semantic-version control.
 
 cmake_minimum_required(VERSION 3.25)
 
@@ -13,12 +13,12 @@ execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
 if(GIT_LATEST_TAG_STRING MATCHES "v([0-9]+\.[0-9]+\.[0-9]+)")
   set(OXCALFRP_VERSION ${CMAKE_MATCH_1})
 else()
-  message(FATAL_ERROR "Can't get project version from Git. "
-                      "Check latest commit tag string, so that it contains the necessary data")
+  message(FATAL_ERROR "Can't get project version from Git. Check latest commit tag string, so that it contains the necessary data")
 endif()
 
 # setup project options
 project(oxcalfrp VERSION ${OXCALFRP_VERSION})
+set(PACKAGE_TYPE_FOR_LINUX DEB CACHE STRING "")
 set(RESOURCES_FOLDER_NAME "resources")
 set(EXTERN_PROJECTS_FOLDER_NAME "extern")
 set(RESOURCES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}")
@@ -200,15 +200,18 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_LIST_DIR}/LICENSE)
   set(CPACK_RESOURCE_FILE_README  ${CMAKE_CURRENT_LIST_DIR}/README.md)
   set(CPACK_VERBATIM_VARIABLES YES)
+  set(CPACK_STRIP_FILES YES)
   if(WIN32)
     set(CPACK_GENERATOR ZIP)
   elseif(APPLE)
     set(CPACK_GENERATOR productbuild)
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(CPACK_GENERATOR DEB)
+    set(CPACK_GENERATOR ${PACKAGE_TYPE_FOR_LINUX})
     set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+    set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
+    set(CPACK_RPM_PACKAGE_AUTOREQ YES)
   else()
     set(CPACK_GENERATOR TXZ)
   endif()
