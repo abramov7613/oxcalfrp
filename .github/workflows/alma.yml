@@ -1,36 +1,54 @@
-# This is a basic workflow that is manually triggered
-
 name: AlmaLinux Manual workflow
-
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  WXWIDGETS_VER: 3.2.6
+  
 jobs:
-  # This workflow contains a single job called "greet"
-  greet:
-    # The type of runner that the job will run on
+  build-alma:
     runs-on: ubuntu-latest
     container: 
       image: almalinux:latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Install Dependencies
+      run: |
+        sudo dnf update
+        sudo dnf groupinstall -y "Development Tools"
+        sudo dnf install -y pkg-config lsb-release git cmake wget openssl-devel zlib-devel gtk3-devel libcurl-devel webkit2gtk3-devel
+
     - uses: kenchan0130/actions-system-info@master
       id: system-info
-      
-    # Runs a single command using the runners shell
-    - name: Send greeting
+
+    - name: Restore wxWidgets from Cache
+      id: restore-cache-wxWidgets
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/wxWidgets-${{env.WXWIDGETS_VER}}
+        key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
+
+    - name: Build wxWidgets
+      if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
       run: |
-        echo "${{ steps.system-info.outputs.cpu-core }}"
-        echo "${{ steps.system-info.outputs.cpu-model }}"
-        echo "${{ steps.system-info.outputs.hostname }}"
-        echo "${{ steps.system-info.outputs.kernel-release }}"
-        echo "${{ steps.system-info.outputs.kernel-version }}"
-        echo "${{ steps.system-info.outputs.name }}"
-        echo "${{ steps.system-info.outputs.platform }}"
-        echo "${{ steps.system-info.outputs.release }}"
-        echo "${{ steps.system-info.outputs.totalmem }}"
-        
+        cd ~
+        wget https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
+        tar -xjf wxWidgets-${{env.WXWIDGETS_VER}}.tar.bz2
+        cd wxWidgets-${{env.WXWIDGETS_VER}}
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
+        cmake --build build
+
+    - name: Install wxWidgets
+      run: |
+        cd ~/wxWidgets-${{env.WXWIDGETS_VER}}
+        sudo cmake --build build --target install
+
+    - name: Save wxWidgets to Cache
+      if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
+      id: save-cache-wxWidgets
+      uses: actions/cache/save@v4
+      with:
+        path: ~/wxWidgets-${{env.WXWIDGETS_VER}}
+        key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
+
+      
