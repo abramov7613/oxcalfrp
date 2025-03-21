@@ -16,7 +16,7 @@ jobs:
       run: |
         dnf -y upgrade
         dnf -y groupinstall "Development Tools"
-        dnf -y install pkg-config lsb-release git cmake wget openssl-devel zlib-devel gtk3-devel libcurl-devel webkit2gtk3-devel
+        dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel
 
     - uses: kenchan0130/actions-system-info@master
       id: system-info
@@ -41,7 +41,7 @@ jobs:
     - name: Install wxWidgets
       run: |
         cd ~/wxWidgets-${{env.WXWIDGETS_VER}}
-        sudo cmake --build build --target install
+        cmake --build build --target install
 
     - name: Save wxWidgets to Cache
       if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
