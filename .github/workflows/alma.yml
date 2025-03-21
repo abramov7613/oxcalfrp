@@ -59,7 +59,7 @@ jobs:
       id: oxcalfrp-build
       run: |
         cd $GITHUB_WORKSPACE
-        git config --global --add safe.directory '${pwd}'
+        git config --global --add safe.directory '*'
         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
         cmake --build build --target package
         cd build
