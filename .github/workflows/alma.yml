@@ -30,10 +30,10 @@ jobs:
     - name: Build wxWidgets
       if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
       run: |
-        cd C:\
-        iwr https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.zip
+        mkdir C:\wxWidgets-${{env.WXWIDGETS_VER}}
+        cd C:\wxWidgets-${{env.WXWIDGETS_VER}}
+        iwr -outf wxWidgets-${{env.WXWIDGETS_VER}}.zip https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.zip
         unzip wxWidgets-${{env.WXWIDGETS_VER}}.zip
-        cd wxWidgets-${{env.WXWIDGETS_VER}}
         cmake -G "MinGW Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
         cmake --build build
 
