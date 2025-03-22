@@ -60,7 +60,8 @@ jobs:
         cmake -G "MinGW Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=Release 
         cmake --build build --target package
         cd build
-        echo "windows_artifact_name=$(ls oxc*.zip)" >> $GITHUB_OUTPUT
+        $name1 = Get-Childitem –Path . -Include oxc*.zip -File
+        echo "windows_artifact_name=$name1" >> $GITHUB_OUTPUT
 
     - name: Upload Windows Artifact
       uses: actions/upload-artifact@v4
