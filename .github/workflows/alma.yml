@@ -49,3 +49,23 @@ jobs:
       with:
         path: C:\wxWidgets-${{env.WXWIDGETS_VER}}
         key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Build oxcalfrp
+      id: oxcalfrp-build
+      run: |
+        cd $GITHUB_WORKSPACE
+        cmake -G "MinGW Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=Release 
+        cmake --build build --target package
+        cd build
+        echo "windows_artifact_name=$(ls oxc*.zip)" >> $GITHUB_OUTPUT
+
+    - name: Upload Windows Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.oxcalfrp-build.outputs.windows_artifact_name }}
+        path: build\${{ steps.oxcalfrp-build.outputs.windows_artifact_name }}
+        compression-level: 0
