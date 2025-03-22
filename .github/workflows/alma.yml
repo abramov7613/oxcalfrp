@@ -19,4 +19,33 @@ jobs:
         iwr -outf mingw.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-i686-posix-dwarf-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
         unzip mingw.zip
         $env:PATH = $env:PATH + ";$pwd\mingw32\bin"
-        cmake --help
+        
+    - name: Restore wxWidgets from Cache
+      id: restore-cache-wxWidgets
+      uses: actions/cache/restore@v4
+      with:
+        path: C:\wxWidgets-${{env.WXWIDGETS_VER}}
+        key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
+
+    - name: Build wxWidgets
+      if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
+      run: |
+        cd C:\
+        iwr https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXWIDGETS_VER}}/wxWidgets-${{env.WXWIDGETS_VER}}.zip
+        unzip wxWidgets-${{env.WXWIDGETS_VER}}.zip
+        cd wxWidgets-${{env.WXWIDGETS_VER}}
+        cmake -G "MinGW Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=Release -DwxBUILD_SHARED=OFF -DwxUSE_STL=ON
+        cmake --build build
+
+    - name: Install wxWidgets
+      run: |
+        cd C:\wxWidgets-${{env.WXWIDGETS_VER}}\build
+        mingw32-make.exe install
+
+    - name: Save wxWidgets to Cache
+      if: steps.restore-cache-wxWidgets.outputs.cache-hit != 'true'
+      id: save-cache-wxWidgets
+      uses: actions/cache/save@v4
+      with:
+        path: C:\wxWidgets-${{env.WXWIDGETS_VER}}
+        key: ${{ runner.os }}-${{ steps.system-info.outputs.name }}-${{ steps.system-info.outputs.release }}-wxWidgets-${{ env.WXWIDGETS_VER }}
