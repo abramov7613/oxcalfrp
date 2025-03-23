@@ -168,6 +168,14 @@ add_dependencies(project_resources
 )
 add_executable(${PROJECT_NAME} WIN32 ${OXCALFRP_SOURCES})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+if(CMAKE_HOST_WIN32)
+  target_link_options(${PROJECT_NAME} PRIVATE
+      $<$<CXX_COMPILER_ID:GNU>:-static>
+      $<$<CXX_COMPILER_ID:GNU>:-static-libgcc>
+      $<$<CXX_COMPILER_ID:GNU>:-static-libstdc++>
+      $<$<CXX_COMPILER_ID:GNU>:-Wl,--subsystem,windows>
+  )
+endif()
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
