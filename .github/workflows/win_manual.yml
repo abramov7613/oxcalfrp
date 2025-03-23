@@ -19,7 +19,7 @@ jobs:
     # Runs a single command using the runners shell
     - name: Send greeting
       run: |
-        $ppath = [System.Environment]::GetEnvironmentVariable('PATH', 'Machine')
-        $ppath = ($ppath.Split(';') | Where-Object{$_ -ne 'C:\mingw64\bin'}) -join ';'
-        [System.Environment]::SetEnvironmentVariable('PATH', $ppath, 'Machine')
+        $ppath = $env:PATH
+        $ppath.Name.Replace("C:\mingw64\bin;", "")
+        $env:PATH = $ppath
         echo "$env:PATH"
