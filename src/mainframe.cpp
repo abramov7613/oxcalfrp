@@ -182,29 +182,29 @@ void MainFrame::OnOutYearInfo(wxCommandEvent&)
   text += year + " год (по " + calendar_type_str + " календарю)</h2>"
           "<p><table style='border-collapse:separate;border-spacing:1.5em;width:100%;'><tr>";
   text += "<td class='Yt'>" + oxc::Date::month_name(1, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 1, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 1, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(2, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 2, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 2, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(3, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 3, 1), calendar_fmt, false) + "</td></tr><tr>";
+  text += cal_ctrl->html_month_table({year, 3, 1, calendar_fmt}, calendar_fmt, false) + "</td></tr><tr>";
   text += "<td class='Yt'>" + oxc::Date::month_name(4, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 4, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 4, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(5, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 5, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 5, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(6, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 6, 1), calendar_fmt, false) + "</td></tr><tr>";
+  text += cal_ctrl->html_month_table({year, 6, 1, calendar_fmt}, calendar_fmt, false) + "</td></tr><tr>";
   text += "<td class='Yt'>" + oxc::Date::month_name(7, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 7, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 7, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(8, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 8, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 8, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(9, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 9, 1), calendar_fmt, false) + "</td></tr><tr>";
+  text += cal_ctrl->html_month_table({year, 9, 1, calendar_fmt}, calendar_fmt, false) + "</td></tr><tr>";
   text += "<td class='Yt'>" + oxc::Date::month_name(10, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 10, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 10, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(11, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 11, 1), calendar_fmt, false) + "</td>";
+  text += cal_ctrl->html_month_table({year, 11, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(12, false) + "<br>";
-  text += cal_ctrl->html_month_table(oxc::Date(year, 12, 1), calendar_fmt, false) + "</td></tr>"
+  text += cal_ctrl->html_month_table({year, 12, 1, calendar_fmt}, calendar_fmt, false) + "</td></tr>"
           "<tr><td colspan='3'><table><tr><td class='month_cell redday'>17</td>"
           "<td> - Двунадесятые или Великие праздники</td></tr><tr>"
           "<td class='month_cell fullday'>17</td>"
