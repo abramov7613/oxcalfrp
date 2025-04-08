@@ -1,16 +1,23 @@
 # generate sqlite database cmd file
 set(PROCESS_DB_CREATE false)
+
 foreach(F IN LISTS SQLITE3_DB_SOURCES)
   if(NOT EXISTS ${F})
     message(FATAL_ERROR "'${F}' file NOT FOUND")
   endif()
-  if(${F} IS_NEWER_THAN ${SQLITE3_DB_FILE})
+  if(NOT EXISTS ${SQLITE3_DB_FILE} OR NOT ${SQLITE3_DB_FILE} IS_NEWER_THAN ${F})
     set(PROCESS_DB_CREATE true)
   endif()
 endforeach()
-if( ${OXC_H_FILE} IS_NEWER_THAN ${SQLITE3_DB_FILE} )
+
+if(NOT EXISTS ${OXC_H_FILE})
+  message(FATAL_ERROR "'${OXC_H_FILE}' file NOT FOUND")
+endif()
+
+if( NOT EXISTS ${SQLITE3_DB_FILE} OR NOT ${SQLITE3_DB_FILE} IS_NEWER_THAN ${OXC_H_FILE} )
   set(PROCESS_DB_CREATE true)
 endif()
+
 if(PROCESS_DB_CREATE)
   message(STATUS "Generate sqlite database cmd file")
   cmake_path(GET SQLITE3_DB_FILE STEM F_NAME)
@@ -20,9 +27,6 @@ if(PROCESS_DB_CREATE)
   endif()
   if(EXISTS ${SQLITE3_DB_FILE})
     file(REMOVE ${SQLITE3_DB_FILE})
-  endif()
-  if(NOT EXISTS ${OXC_H_FILE})
-    message(FATAL_ERROR "'${OXC_H_FILE}' file NOT FOUND")
   endif()
   execute_process(
     COMMAND
@@ -53,6 +57,7 @@ endif()
 # generate & add resource headers
 set(PROCESS_RESOURCES false)
 set(RESOURCES_HEADERS_DIR "${CMAKE_BINARY_DIR}/embedded_resources")
+
 if( (NOT EXISTS "${CMAKE_BINARY_DIR}/resource.hpp") OR
       (NOT EXISTS "${CMAKE_BINARY_DIR}/resource_holder.hpp") )
   set(PROCESS_RESOURCES true)
@@ -68,12 +73,13 @@ else()
     )
     string(STRIP ${HDR_NAME} HDR_NAME)
     set(HDR_FILE "${RESOURCES_HEADERS_DIR}/${HDR_NAME}")
-    if(${F} IS_NEWER_THAN ${HDR_FILE})
+    if(NOT ${HDR_FILE} IS_NEWER_THAN ${F})
       set(PROCESS_RESOURCES true)
       break()
     endif()
   endforeach()
 endif()
+
 if(PROCESS_RESOURCES)
   file(REMOVE_RECURSE ${RESOURCES_HEADERS_DIR})
   file(REMOVE "${CMAKE_BINARY_DIR}/resource.hpp")
