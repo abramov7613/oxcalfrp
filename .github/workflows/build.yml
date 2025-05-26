@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  WXWIDGETS_VER: 3.2.6
+  WXWIDGETS_VER: 3.2.8.1
 
 jobs:
 
