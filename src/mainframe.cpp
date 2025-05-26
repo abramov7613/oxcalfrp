@@ -3,6 +3,9 @@
 #include <wx/frame.h>                                      // for wxFrameBase::sm_eventTable
 #include <wx/menu.h>                                       // for wxMenu, wxMenuBar
 #include <wx/webview.h>                                    // for wxWebView
+#ifdef __WXMSW__
+  #include <wx/msw/webview_ie.h>                           // for wxWebViewIE
+#endif
 #include <wx/msgdlg.h>                                     // for wxMessageBox
 #include <wx/sizer.h>                                      // for wxBoxSizer, wxSizerFlags
 #include <wx/stringimpl.h>                                 // for wxEmptyString
@@ -55,6 +58,10 @@ MainFrame::MainFrame(wxWindow *parent, const wxWindowID id, const wxString& titl
   SetMenuBar(m_menubar);
   // create controls
   html_ctrl = wxWebView::New(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(420, 340));
+  #ifdef __WXMSW__
+  auto iectrlptr = static_cast<wxWebViewIE*>(html_ctrl->GetNativeBackend());
+  if(iectrlptr) iectrlptr->MSWSetEmulationLevel(wxWEBVIEWIE_EMU_IE8);
+  #endif
   wxFileSystem::AddHandler(new wxMemoryFSHandler);
   wxMemoryFSHandler::AddFile(wxString(html_ctrl_content_filename), wxEmptyString);
   html_ctrl->RegisterHandler(wxSharedPtr<wxWebViewHandler>(new wxWebViewFSHandler("memory")));
@@ -73,7 +80,8 @@ void MainFrame::OnOpen(wxCommandEvent&)
 {
   wxFileDialog dialog(this, wxString::FromUTF8("Открыть ..."), wxEmptyString, wxEmptyString,
                         wxString::FromUTF8("html files|*.html|htm files|*.htm"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
-  if(dialog.ShowModal() != wxID_CANCEL) html_ctrl->LoadURL(wxString::FromUTF8("file:") + dialog.GetPath());
+  if(dialog.ShowModal() != wxID_CANCEL) 
+    html_ctrl->LoadURL(wxString::FromUTF8("file:") + dialog.GetPath());
 }
 
 void MainFrame::OnSave(wxCommandEvent&)
