@@ -76,10 +76,10 @@ endif()
 # get sqlite3
 # =================================================================================
 CPMAddPackage(
-    NAME sqlite3
-    URL "https://sqlite.org/2025/sqlite-amalgamation-3490100.zip"
-    URL_HASH SHA256=6cebd1d8403fc58c30e93939b246f3e6e58d0765a5cd50546f16c00fd805d2c3
-    DOWNLOAD_ONLY TRUE
+  NAME sqlite3
+  URL "https://github.com/abramov7613/sqlite-amalgamation-mirror/archive/refs/heads/main.zip"
+  URL_HASH SHA256=e5767bdc60c09b31066c534a3dc3d4bd5d335377b443c4aa67ff5fa6a9746791
+  DOWNLOAD_ONLY TRUE
 )
 if(NOT sqlite3_ADDED)
   message(FATAL_ERROR "Can't get SQLite3 library")
