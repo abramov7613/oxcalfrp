@@ -198,7 +198,7 @@ std::string CalendarPanel::html_month_table(const oxc::Date& date, const oxc::Ca
   //add empty cells
   for(auto i=first_day_dn; i>0; --i) {
     html += "<td class='month_cell'></td>";
-    if(++c==7) { c = 0; html += "</tr>"; }
+    if(++c==7) { c = 0; html += "</tr><tr>"; }
   }
   //add cells with values
   for(int8_t i=1; i<=days_count; ++i) {
@@ -229,8 +229,14 @@ std::string CalendarPanel::html_month_table(const oxc::Date& date, const oxc::Ca
     if(clickevent) html += " onclick=\"document.title='"+std::to_string(i)+"';\"";
     if(clickevent && i==d) html += " id='current'";
     html += '>'+std::to_string(i)+"</td>";
-    if(++c==7) { c = 0; html += "</tr>"; }
+    if(++c==7) { c = 0; html += "</tr><tr>"; }
   }
+  //add empty cells if need
+  while(c!=0){
+    html += "<td class='month_cell'></td>";
+    if(++c==7) { c = 0; }
+  }
+  if(html.ends_with("<tr>")) html.erase(html.size()-4);
   if(!html.ends_with("</tr>")) html += "</tr>";
   html += "</tbody></table>";
   return html;
@@ -291,7 +297,8 @@ void CalendarPanel::reset_days_table(const oxc::Date& newdate)
 {
   auto date = wxGetApp().date();
   auto calendar = wxGetApp().calendar();
-  std::string html = "<html><head><meta charset='utf-8'>" + wxString::FromUTF8(html_css())
+  std::string html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>"
+                        + wxString::FromUTF8(html_css())
                         + "</head><body>" + wxString::FromUTF8(html_month_table(newdate, calendar_mode, true))
                         + "</body></html>";
   wxMemoryFSHandler::RemoveFile(html_table_filename);

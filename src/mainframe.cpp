@@ -80,7 +80,7 @@ void MainFrame::OnOpen(wxCommandEvent&)
 {
   wxFileDialog dialog(this, wxString::FromUTF8("Открыть ..."), wxEmptyString, wxEmptyString,
                         wxString::FromUTF8("html files|*.html|htm files|*.htm"), wxFD_OPEN|wxFD_FILE_MUST_EXIST);
-  if(dialog.ShowModal() != wxID_CANCEL) 
+  if(dialog.ShowModal() != wxID_CANCEL)
     html_ctrl->LoadURL(wxString::FromUTF8("file:") + dialog.GetPath());
 }
 
@@ -184,11 +184,14 @@ void MainFrame::OnOutYearInfo(wxCommandEvent&)
     }
     return result;
   };
-  std::string text { "<html><head><meta charset='utf-8'>" + cal_ctrl->html_css() };
-  text += "<style type='text/css'>.Yt{text-align:center;vertical-align:top;}</style>"
+  std::string text { "<!DOCTYPE html><head><title>Календарь</title>"
+                     "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>" };
+  text += cal_ctrl->html_css() ;
+  text += "<style type='text/css'>.Yt{text-align:center;vertical-align:top;}"
+          "body { font-family: 'DejaVu Sans', sans-serif; }</style>"
           "</head><body><p><h2 style='text-align:center;'>" ;
   text += year + " год (по " + calendar_type_str + " календарю)</h2>"
-          "<p><table style='border-collapse:separate;border-spacing:1.5em;width:100%;'><tr>";
+          "<table style='border-collapse:separate;border-spacing:1.5em;width:100%;'><tr>";
   text += "<td class='Yt'>" + oxc::Date::month_name(1, false) + "<br>";
   text += cal_ctrl->html_month_table({year, 1, 1, calendar_fmt}, calendar_fmt, false) + "</td>";
   text += "<td class='Yt'>" + oxc::Date::month_name(2, false) + "<br>";
@@ -275,7 +278,7 @@ void MainFrame::print_to_html_ctrl(const std::string& s, const bool append)
 void MainFrame::print_date_info()
 {
   static const char* tt =
-    R"---(<html><head><meta charset='utf-8'>
+    R"---(<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
     <style type='text/css'>
     table {
       border-collapse: collapse;
@@ -299,6 +302,7 @@ void MainFrame::print_date_info()
       text-align: center;
       vertical-align: middle;
     }
+    body { font-family: 'DejaVu Sans', sans-serif; }
     </style>
     </head><body><p>
     <table><thead><tr>
