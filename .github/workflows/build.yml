@@ -102,6 +102,7 @@ jobs:
     steps:
     - name: Install Dependencies
       run: |
+        dnf install -y epel-release
         dnf -y upgrade
         dnf -y groupinstall "Development Tools"
         dnf -y install cmake wget openssl-devel gtk3-devel libcurl-devel webkit2gtk3-devel
