@@ -297,9 +297,10 @@ void CalendarPanel::reset_days_table(const oxc::Date& newdate)
   auto date = wxGetApp().date();
   auto calendar = wxGetApp().calendar();
   std::string html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>"
-                        + wxString::FromUTF8(html_css())
-                        + "</head><body>" + wxString::FromUTF8(html_month_table(newdate, calendar_mode, true))
-                        + "</body></html>";
+                        + html_css()
+                        + "</head><body>" 
+                        + html_month_table(newdate, calendar_mode, true)
+                        + "</body></html>" ;
   wxMemoryFSHandler::RemoveFile(html_table_filename);
   wxMemoryFSHandler::AddFile(html_table_filename, html);
   calendar_ctrl->LoadURL(wxString{} << "memory:" << html_table_filename);
