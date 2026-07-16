@@ -8,7 +8,6 @@
 #endif
 #include <wx/msgdlg.h>                                     // for wxMessageBox
 #include <wx/sizer.h>                                      // for wxBoxSizer, wxSizerFlags
-#include <wx/stringimpl.h>                                 // for wxEmptyString
 #include <wx/msgdlg.h>                                     // for wxMessageBox
 #include <wx/webviewfshandler.h>                           // for wxWebViewFSHandler
 #include <wx/sharedptr.h>                                  // for wxSharedPtr
