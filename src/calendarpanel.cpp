@@ -8,7 +8,6 @@
 #include <wx/msgdlg.h>                                     // for wxMessageBox
 #include <wx/fs_mem.h>                                     // for wxMemoryFSHandler
 #include <wx/sizer.h>                                      // for wxSizerFlags
-#include <wx/stringimpl.h>                                 // for wxEmptyString
 #include <exception>                                       // for exception
 #include "mainframe.h"                                     // for MainFrame
 #include "main.h"                                          // for wxGetApp
